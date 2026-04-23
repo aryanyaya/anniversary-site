@@ -918,6 +918,7 @@
             justify-content: center;
             overflow: hidden;
             cursor: grab;
+            touch-action: pan-x pinch-zoom;
         }
 
         .vinyl-container:active {
@@ -2194,10 +2195,11 @@
                 isDragging = true;
                 startX = getPositionX(e);
                 cancelAnimationFrame(animationID);
-            });
+            }, { passive: true });
 
             container.addEventListener('touchmove', (e) => {
                 if (!isDragging) return;
+                e.preventDefault();
                 const currentPosition = getPositionX(e);
                 const diff = currentPosition - startX;
                 currentTranslate += diff * 0.5;
@@ -2209,7 +2211,7 @@
                 currentTranslate = Math.max(maxTranslate, Math.min(minTranslate, currentTranslate));
                 
                 track.style.transform = `translateX(${currentTranslate}px)`;
-            });
+            }, { passive: false });
 
             container.addEventListener('touchend', () => {
                 isDragging = false;
