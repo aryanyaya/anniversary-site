@@ -34,6 +34,8 @@
             background: var(--bg-dark);
             color: #2D1525;
             overflow-x: hidden;
+            touch-action: pan-y pinch-zoom;
+            -webkit-overflow-scrolling: touch;
         }
 
         .hidden {
@@ -2031,6 +2033,10 @@
             }
         }
 
+        // Fix passive listener warning
+        document.addEventListener('touchmove', (e) => {
+        }, { passive: true });
+
         // Vinyl Photo Gallery
         const vinylPhotos = [
             'photos/others/WhatsApp Image 2026-04-23 at 7.31.50 PM (1).jpeg',
@@ -2132,6 +2138,9 @@
             }
 
             function animate() {
+                const maxTranslate = 0;
+                const minTranslate = -(cards.length - 1) * cardWidth + (container.offsetWidth - cardWidth);
+                
                 if (isSnapping) {
                     const targetPosition = -currentIndex * cardWidth + (container.offsetWidth - cardWidth) / 2;
                     const diff = targetPosition - currentTranslate;
@@ -2142,6 +2151,9 @@
                         isSnapping = false;
                     }
                 }
+                
+                // Clamp to boundaries
+                currentTranslate = Math.max(maxTranslate, Math.min(minTranslate, currentTranslate));
                 
                 track.style.transform = `translateX(${currentTranslate}px)`;
                 animationID = requestAnimationFrame(animate);
@@ -2165,6 +2177,12 @@
                 const diff = currentPosition - startX;
                 currentTranslate += diff * 0.5;
                 startX = currentPosition;
+                
+                // Clamp to boundaries
+                const maxTranslate = 0;
+                const minTranslate = -(cards.length - 1) * cardWidth + (container.offsetWidth - cardWidth);
+                currentTranslate = Math.max(maxTranslate, Math.min(minTranslate, currentTranslate));
+                
                 track.style.transform = `translateX(${currentTranslate}px)`;
             });
 
@@ -2208,6 +2226,12 @@
                 const diff = currentPosition - startX;
                 currentTranslate += diff * 0.5;
                 startX = currentPosition;
+                
+                // Clamp to boundaries
+                const maxTranslate = 0;
+                const minTranslate = -(cards.length - 1) * cardWidth + (container.offsetWidth - cardWidth);
+                currentTranslate = Math.max(maxTranslate, Math.min(minTranslate, currentTranslate));
+                
                 track.style.transform = `translateX(${currentTranslate}px)`;
             });
 
