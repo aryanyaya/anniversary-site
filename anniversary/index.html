@@ -915,10 +915,15 @@
             position: relative;
             display: flex;
             align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            justify-content: flex-start;
+            overflow-x: auto;
+            overflow-y: hidden;
             cursor: grab;
             touch-action: pan-x pinch-zoom;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            gap: 30px;
+            padding: 0 calc(50% - 140px);
         }
 
         .vinyl-container:active {
@@ -928,8 +933,7 @@
         .vinyl-track {
             display: flex;
             gap: 30px;
-            transition: transform 0.1s ease-out;
-            will-change: transform;
+            will-change: scroll-position;
         }
 
         .vinyl-card {
@@ -2195,7 +2199,7 @@
                 isDragging = true;
                 startX = getPositionX(e);
                 cancelAnimationFrame(animationID);
-            }, { passive: true });
+            }, { passive: false });
 
             container.addEventListener('touchmove', (e) => {
                 if (!isDragging) return;
@@ -2256,11 +2260,23 @@
                 }
             });
 
-            // Initialize
-            currentTranslate = (container.offsetWidth - cardWidth) / 2;
-            prevTranslate = currentTranslate;
-            updateCards();
-            animate();
+            // Native scroll event - update cards position
+            container.addEventListener('scroll', () => {
+                const scrollLeft = container.scrollLeft;
+                currentIndex = Math.round(scrollLeft / cardWidth);
+                currentIndex = Math.max(0, Math.min(cards.length - 1, currentIndex));
+                updateCards();
+            });
+
+            // Initialize - center the cards natively
+            function initScrollPosition() {
+                const centerPos = (cards.length - 1) / 2 * cardWidth;
+                container.scrollLeft = centerPos;
+                currentIndex = Math.round(centerPos / cardWidth);
+                updateCards();
+            }
+            
+            initScrollPosition();
         }
     </script>
 </body>
